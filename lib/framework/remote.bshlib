@@ -1,0 +1,75 @@
+#!/usr/bin/bash
+
+[[ -z "$MOON_BSHAUTO_COMMON_LIB_DEF" ]] && . $MOON_BSHAUTO_FW_LIB/common.bshlib
+
+MOON_BSHAUTO_REMOTE_LIB_DEF=YES
+
+function _rcml {
+    local cml="$*"
+    local passwd=${MOON_BSHAUTO_EXP_USER_PASSWD:-"changeme"}
+    local tmo=${MOON_BSHAUTO_EXP_TMO:-30}
+    
+    local log_file="/tmp/$(random_num).$$"
+    local ret=0
+
+expect >$log_file 2>&1 <<EOF
+    set timeout $tmo
+    spawn $cml
+    expect {
+        -re "yes/no" {
+            send "yes\r"
+            exp_continue
+        }
+        -re "assword:" {
+            send "$passwd\r" 
+            exp_continue
+        }
+        timeout {
+            send_user "exp_timeout_error\n"
+            exit 9
+        }
+        eof {
+            catch wait ret
+            exit [lindex \$ret 3] 
+        }
+    }
+EOF
+
+    ret=$?
+    sed -r "s/\r//g; 1,/'s password: $/d" $log_file
+
+    rm -rf $log_file
+    return $ret
+}
+
+function rcml_expl {
+    assert $# -gt 3
+
+    local user=$1
+    local passwd=$2
+    local host=$3
+    shift 3
+
+    MOON_BSHAUTO_EXP_USER_PASSWD=$passwd
+
+    # combine the keywords and make a cml for spawn
+    local cml=$(sed -r "s/\"/'/g" <<< "$*")
+    local cml="${EXP_RCMD:-ssh} $user@$host \"$cml\""
+
+    _rcml "$cml"
+    return $?
+}
+
+function rcml_host {
+    assert $# -gt 1
+    rcml_expl ${MOON_BSHAUTO_EXP_USER:-"leo"} ${MOON_BSHAUTO_EXP_USER_PASSWD:-"changeme"} $@
+    return $?
+}
+
+function rcml {
+    assert $# -gt 0
+
+    local cml="$@"
+    _rcml "$cml"
+    return $?
+}

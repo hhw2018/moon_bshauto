@@ -1,0 +1,4 @@
+. $MOON_BSHAUTO_TC_DIR/dir_1.bshlib
+log_assert "begin dir_1/setup"
+log_msg "dir_1/setup"
+log_fail "end dir_1/setup"

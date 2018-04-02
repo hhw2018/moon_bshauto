@@ -1,0 +1,5 @@
+. $MOON_BSHAUTO_TC_DIR/dir_1.bshlib
+log_onexit cleanup
+log_msg "dir_1/dir_1_tc1"
+log_must rcmd_host localhost "egrep '^abc|def$' /tmp/file"
+log_must rcml_host localhost "egrep '^abc|def$' /tmp/file"

@@ -1,0 +1,4 @@
+. $MOON_BSHAUTO_TC_DIR/dir_1.bshlib
+log_assert "begin dir_1/cleanup"
+log_msg "dir_1/cleanup"
+log_pass "end dir_1/cleanup"

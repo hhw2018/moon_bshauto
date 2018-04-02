@@ -1,0 +1,6 @@
+. $MOON_BSHAUTO_TC_DIR/dir_1.bshlib
+log_onexit cleanup1
+log_assert "begin dir_1/dir_1_tc2"
+log_msg "dir_1/dir_1_tc2"
+log_msg "$config"
+log_fail "end dir_1/dir_1_tc2"

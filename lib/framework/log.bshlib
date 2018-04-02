@@ -1,0 +1,83 @@
+#!/usr/bin/bash
+
+[[ -z "$MOON_BSHAUTO_COMMON_LIB_DEF" ]] && . $MOON_BSHAUTO_FW_LIB/common.bshlib
+MOON_BSHAUTO_LOG_LIB_DEF=YES
+
+# Global vars, used for "log_" functions only.
+MOON_BSHAUTO_TC_ONEXIT=""
+
+function log_msg {
+    echo "$(get_date) $@" | tee -a $MOON_BSHAUTO_LOG_FILE
+    #echo "$(get_date) $@" >> $MOON_BSHAUTO_LOG_FILE
+}
+
+function _onexit {
+    local func="$MOON_BSHAUTO_TC_ONEXIT"
+    MOON_BSHAUTO_TC_ONEXIT=""
+    if [[ -n "$func" ]]; then
+        log_msg "ONEXIT: Call function '$func'"
+        $func
+    fi
+}
+
+function log_onexit {
+    MOON_BSHAUTO_TC_ONEXIT="$@"
+}
+
+function log_assert {
+    log_msg "VERIFY: $@"
+}
+
+function log_pass {
+    log_msg "PASSED: $@"
+    _onexit
+    exit 0
+}
+
+function log_fail {
+    log_msg "FAILED: $@"
+    _onexit
+    exit 1
+}
+
+function log_must {
+    local out=""
+    local ret=1
+
+    out=$($@ 2>&1)
+    ret=$?
+    
+    log_msg "ACTION: $@ (ret=$ret)"
+    log_msg "OUTPUT: $out"
+
+    if ((ret == 0)); then
+       return 0
+    else
+        log_fail "$@"
+    fi
+}
+
+function log_mustnot {
+    local out=""
+    local ret=1
+
+    out=$($@ 2>&1)
+    ret=$?
+    
+    log_msg "ACTION: $@ (ret=$ret)"
+    log_msg "OUTPUT: $out"
+
+    if ((ret != 0)); then
+       return 0
+    else
+        log_fail "$@"
+    fi
+}
+
+function log_dmsg {
+    ((MOON_BSHAUTO_DEBUG == 0)) && return 0
+
+    log_msg "DEBUG: Function Stack: "$(sed -r 's/ /<-/' <<< "${FUNCNAME[@]:1}")
+    log_msg "DEBUG: $*"
+}
+

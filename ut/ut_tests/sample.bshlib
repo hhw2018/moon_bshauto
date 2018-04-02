@@ -1,0 +1,7 @@
+function cleanup {
+    log_msg "dir_1: onexit"
+}
+
+function cleanup1 {
+    log_msg "dir_1: onexit1"
+}

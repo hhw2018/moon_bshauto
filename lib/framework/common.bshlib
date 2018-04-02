@@ -1,0 +1,31 @@
+#!/usr/bin/bash
+
+MOON_BSHAUTO_COMMON_LIB_DEF=YES
+
+function assert {
+    eval [[ $@ ]] && return 0 || { echo "Argument error: $@" ; exit 1; }
+}
+
+function random_num {
+    local ret=$(head -1 /dev/urandom | cksum)
+    echo ${ret% *}
+}
+
+function is_str_existed {
+    local str="$1"
+    local in="$2"
+    local ret=0
+
+    if [[ -f "$in" ]]; then 
+        ret=$(egrep "$str" "$in" &>/dev/null; echo $?)
+    else
+        ret=$(echo -e "$in" | egrep "$str" &>/dev/null; echo $?)
+    fi
+
+    return $ret
+}
+
+function get_date {
+    echo $(date +%Y-%m-%d-%H:%M:%S)
+}
+
