@@ -1,0 +1,15 @@
+#!/usr/bin/bash
+
+MOON_BSHAUTO_NET_LIB_DEF=YES
+
+function net_break_by_ipt {
+    local nic=$1
+    iptables -I INPUT -i $nic -j DROP
+    return $?
+}
+
+function net_recover_by_ipt {
+    local nic=$1
+    iptables -D INPUT -i $nic -j DROP
+    return $?
+}
