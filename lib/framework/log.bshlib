@@ -1,5 +1,3 @@
-#!/usr/bin/bash
-
 [[ -z "$MOON_BSHAUTO_COMMON_LIB_DEF" ]] && . $MOON_BSHAUTO_FW_LIB/common.bshlib
 MOON_BSHAUTO_LOG_LIB_DEF=YES
 
@@ -7,8 +5,8 @@ MOON_BSHAUTO_LOG_LIB_DEF=YES
 MOON_BSHAUTO_TC_ONEXIT=""
 
 function log_msg {
-    echo "$(get_date) $@" | tee -a $MOON_BSHAUTO_LOG_FILE
-    #echo "$(get_date) $@" >> $MOON_BSHAUTO_LOG_FILE
+    #echo "$(get_date) $@" | tee -a $MOON_BSHAUTO_LOG_FILE
+    echo "$(get_date) $@" >> $MOON_BSHAUTO_LOG_FILE
 }
 
 function _onexit {

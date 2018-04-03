@@ -1,4 +1,4 @@
-#!/usr/bin/bash 
+#!/usr/bin/env bash 
 NAME=${0##*/}
     
 function usage {

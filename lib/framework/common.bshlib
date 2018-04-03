@@ -1,5 +1,3 @@
-#!/usr/bin/bash
-
 MOON_BSHAUTO_COMMON_LIB_DEF=YES
 
 function assert {

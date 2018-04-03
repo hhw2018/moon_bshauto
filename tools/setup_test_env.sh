@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 #for p in functional stress performance longevity; do
 for p in functional stress; do
