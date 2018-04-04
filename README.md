@@ -24,10 +24,10 @@ User libraries are used for users' business purpose(tests or tools), they can ca
 defined in framework libraries and always they are used only for test cases and user tools. 
 
 ### conf
-####framework
+#### framework
 Environment variables are defined here which are used for framework.
 
-####user
+#### user
 Environment variables are defined here which are used for users' business purpose, please be
 noted that we can re-defined framework environment variables here.
 
@@ -67,7 +67,7 @@ way to write your own test cases:
 
 ## Usage
 1. On a local linux machine, clone moon_bshauto.
-2. Deploy moon_bshauto to the remote machines.
+2. Deploy moon_bshauto to the remote nodes.
 ```
   # moon_bshauto/tools/deploy.sh
   Usage: deploy.sh -f host_file|-h host_list [-d path]
@@ -90,13 +90,15 @@ way to write your own test cases:
   
   # moon_bshauto/bin/driver.sh -f -d ut_test 
 ```
-4. Two ways to use tools:
+4. Two ways to run tools:
 * Execute the tool directly.
+
   Register the necessary libraries and configuration files by the tool itself.
 ```  
   # moon_bshauto/tools/deploy.sh -h 192.168.78.78
 ```
 * Execute the tool by driver.sh.
+
 driver.sh has registered all the framework libraries and configuration files,
 users can focus on their business purpose.
 ```
