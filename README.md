@@ -54,16 +54,21 @@ Put all ut scripts here.
 Please be noted that this is a sample for writing test cases. Please follow the
 way to write your own test cases:
 * config
+
   The config file defines all envrionment variables used for the test cases.
 * xx.bshlib
+
   The library file defines all functions used for the test cases.
 * setup
+
   The setup file will prepare the testing environment for the test cases.
 * test cases
+
   Testing steps and expected results are defined. 
 * cleanup
+
   The cleanup file will clean the testing environment after all test cases.
-*Please never rename the config/setup/cleanup files.*
+  *Please never rename the config/setup/cleanup files.*
 
 ## Usage
 1. On a local linux machine, clone moon_bshauto.
@@ -99,8 +104,8 @@ way to write your own test cases:
 ```
 * Execute the tool by driver.sh.
 
-driver.sh has registered all the framework libraries and configuration files,
-users can focus on their business purpose.
+  driver.sh has registered all the framework libraries and configuration files,
+  users can focus on their business purpose.
 ```
 # moon_bshauto/bin/driver.sh -t "tool arglist".
 
