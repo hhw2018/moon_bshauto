@@ -53,26 +53,106 @@ User-defined tools are created here, which are implemented for business purpose.
 ### ut
 Put all ut scripts here.
 
-#### ut_tests
+## Examples
+### Test Case Example
 Please be noted that this is a sample for writing test cases. Please follow the
 way to write your own test cases:
+
+* Test case directory 
+
+  ut_tests
+
+  Put ut_tests into one of the directories: functional/stress/longevity/performance.
 * config
 
   The config file defines all envrionment variables used for the test cases.
-* xx.bshlib
+```
+    export MOON_BSHAUTO_EXP_USER=root
+    export MOON_BSHAUTO_EXP_USER_PASSWD=changeme
+    export TEST_FILE=/tmp/test_file.$$
+    export REMOTE=localhost
+    export SIZE=10
+  
+```
+* dir_1.bshlib
 
   The library file defines all functions used for the test cases.
+```
+    function cleanup {
+        log_msg "cleanup: called before tc exits."
+    }
+    
+    function cp_file_to_remote {
+        # log_must means its following command must return a correct result, i.e. $? = 0.
+        # the testing will abort if command fails.
+        # Please refer to the log_ functions in log.bshlib file.
+        log_must rcml scp -rp $TEST_FILE $MOON_BSHAUTO_EXP_USER@$REMOTE:${TEST_FILE}.dup
+    }
+    
+    function chk_remote_file_exist {
+        log_must rcml_host $REMOTE ls ${TEST_FILE}.dup
+    }
+    
+    function chk_remote_file_size {
+        local size=0
+        size=$(rcml_host $REMOTE stat -c %s ${TEST_FILE}.dup)
+        (( size = size / 1024 / 1024))
+        log_must assert $size -eq $SIZE
+    }
+```
 * setup
 
   The setup file will prepare the testing environment for the test cases.
-* test cases
+```
+    log_assert "Create a 10m file."
+    log_must dd if=/dev/urandom of=$TEST_FILE bs=1M count=$SIZE
+    log_pass "Created a 10m file."
+```
+* dir_1_tc1, dir_1_tc2, dir_1_tc3
 
-  Testing steps and expected results are defined. 
+  Test cases.
+```
+    # Register functions defined in local lib file; driver.sh has already
+    # register all framework lib functions; Also, we can register user lib
+    # functions here.
+    . $MOON_BSHAUTO_TC_DIR/dir_1.bshlib
+    
+    # Register cleanup function, which can be called before tc exits.
+    log_onexit cleanup 
+    
+    # Explicitly describe what the tc will verify.
+    log_assert "Copy a local file to the remote."
+
+    # The testing steps and expected results are defined in this function.
+    cp_file_to_remote 
+
+    # Explicitly give the PASSED result in log. Also, we have another log_fail
+    # function to give the FAILED result.
+    log_pass "Copied a local file to the remote sucessfully."
+```
 * cleanup
 
   The cleanup file will clean the testing environment after all test cases.
-
+```
+    log_assert "Remove the file created."
+    log_must rm -rf $TEST_FILE
+    log_pass "Removed the test file."
+```
   **Please never rename the config/setup/cleanup files.**
+
+  Log snippet 
+```
+    2018-04-04-22:16:48 TEST CASE: /root/moon_bshauto/tests/functional/ut_tests/dir_1_tc1
+    2018-04-04-22:16:48 VERIFY: Copy a local file to the remote.
+    2018-04-04-22:16:48 ACTION: rcml scp -rp /tmp/test_file.10480 root@localhost:/tmp/test_file.10480.dup (ret=0)
+    2018-04-04-22:16:48 OUTPUT: test_file.10480      0% 0     0.0KB/s   --:-- ETAtest_file.10480                                                                                             100% 10MB  10.0MB/s   00:00
+    2018-04-04-22:16:48 PASSED: Copied a local file to the remote sucessfully.
+    2018-04-04-22:16:48 ONEXIT: Call function 'cleanup'
+    2018-04-04-22:16:48 cleanup: called before tc exits.
+```
+### Tools Example
+For the tools executed directly, please refer to tools/deploy.sh.
+For the tools executed by driver.sh, please refer to tools/test_remote_bshlib.sh.
 
 ## Usage
 1. On a local linux machine, clone moon_bshauto.
