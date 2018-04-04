@@ -19,7 +19,7 @@ function config {
     export MOON_BSHAUTO_FW_LIB=$MOON_BSHAUTO_HOME/lib/framework
     export MOON_BSHAUTO_FW_CONF=$MOON_BSHAUTO_HOME/conf/framework
      
-    # Register the framework env vars as well as libs 
+    # Register the necessary framework env vars as well as libs 
     . $MOON_BSHAUTO_FW_LIB/remote.bshlib
     . $MOON_BSHAUTO_FW_CONF/expect.cfg
 }

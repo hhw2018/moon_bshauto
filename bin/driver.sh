@@ -3,15 +3,18 @@
 function usage {
     local name=${0##*\/}
 
-    echo "Usage:"
-    echo "   Functional Test: $name -f [-d dir1 -d dir2 ...] [tc tc ...]"
-    echo "       Stress Test: $name -s [-d dir1 -d dir2 ...] [tc tc ...]"
-    echo "  Performance Test: $name -p [-d dir1 -d dir2 ...] [tc tc ...]"
-    echo "    Longevity Test: $name -l [-d dir1 -d dir2 ...] [tc tc ...]"
-    echo 
-    echo "Usage:"
-    echo "        Tool Usage: $name -t \"tool_script arglist\""
+cat <<EOF
+Usage: driver.sh -f|-s|-p|-l [-d dir1 [-d dir2 ...]] [tc [tc...]]
+  -f: Perform functional testing under tests/functional.
+  -s: Perform stress testing under tests/stress.
+  -p: Perform performance testing under tests/performance.
+  -l: Perform longevity testing under tests/longevity.
+  -d: Test case directory name.
+  tc: Test case name, which is global unique.
 
+Usage: $name -t "tool_script arglist"
+  -t: The tool name and its arguments.
+EOF
     exit 1
 }
 
