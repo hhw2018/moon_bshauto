@@ -1,0 +1,71 @@
+MOON_BSHAUTO_MEMORY_LIB_DEF=YES
+
+function _get_value_from_meminfo {
+    local key="$1"
+    local val=$(egrep "^${key}:" /proc/meminfo | awk '{print $2}')
+    echo "$val"
+}
+
+function mem_get_total {
+    _get_value_from_meminfo MemTotal
+}
+
+function mem_get_free {
+    _get_value_from_meminfo MemFree
+}
+
+function mem_get_used_perc {
+    local used=0
+    local perc=0
+    local total=$(mem_get_total) 
+    local free=$(mem_get_free)
+
+    ((used = total - free))
+    perc=$(echo "scale=2; $used / $total * 100" | bc)
+    echo "${perc%.*}"
+}
+
+MEM_MAX_PROC_CNT=50 # Max 50 eat_mem processes created.
+MEM_PROC_MAX_MEM=20 # Max 20G memory used by one process.
+# mem_eat count
+# count: how many KBs to be eat.
+function mem_eat {
+    local cnt=$1
+    local proc_cnt=0
+    local mem_cnt=0
+
+    ((cnt = cnt / 1024 + 1)) # Alway eat 1M more.
+    ((proc_cnt = cnt / (MEM_PROC_MAX_MEM*1024)))
+
+    if ((proc_cnt > MEM_MAX_PROC_CNT)); then
+        ((proc_cnt = MEM_MAX_PROC_CNT))
+    elif ((proc_cnt == 0)); then 
+        ((proc_cnt = 1))
+    fi
+
+    ((mem_cnt = cnt / proc_cnt))
+    
+    while ((proc_cnt-- > 0)); do
+        $MOON_BSHAUTO_BIN/eat_mem $mem_cnt &
+    done
+}
+
+function mem_fill_perc {
+    local perc=$1
+    local used=0
+    local to_be_eat=0
+    local used_exp=0
+    local total=$(mem_get_total) 
+    local free=$(mem_get_total)
+    
+    used_exp=$(echo "scale=4; $perc / 100 * $total" | bc)
+    used_exp="${used_exp%.*}"
+    ((to_be_eat = used_exp - (total - free)))
+
+    ((to_be_eat > 0)) && mem_eat $to_be_eat 
+}
+ 
+function mem_free {
+    pkill -9 eat_mem
+}
+
