@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <assert.h>
 #include <unistd.h>
 #include <string.h>
+#include <assert.h>
 #include <pthread.h>
 
 /* One thread eats MAX_MEM_CNT G memory at most */
@@ -12,6 +12,12 @@
 #define MAX_THD_CNT 10
 
 static pthread_mutex_t mutex;
+
+void usage() {
+    printf("Usage: eat_mem mem_size\n");
+    printf("  mem_size: Amount of memory space to be filled(unit: MB).\n");
+    exit(1);
+}
 
 void * eat_mem (void *arg) {
     int cnt = *(int *)arg;
@@ -42,7 +48,9 @@ void * eat_mem (void *arg) {
 }
 
 int main(int argc, char* argv[]) {
-    assert(argc == 2);
+    if (argc != 2) {
+        usage();
+    }
 
     int ret = pthread_mutex_init(&mutex, NULL);
     assert(ret == 0);
