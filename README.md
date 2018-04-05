@@ -53,6 +53,16 @@ User-defined tools are created here, which are implemented for business purpose.
 ### ut
 Put all ut scripts here.
 
+### src
+Often, we need to implement some functions with c programs, put the source code
+into src directory, and install the binary files into bin.
+```
+  # cd src
+  # make clean
+  # make all
+  # make install
+``` 
+
 ## Examples
 ### Test Case Example
 Please be noted that this is a sample for writing test cases. Please follow the
@@ -156,7 +166,14 @@ For the tools executed by driver.sh, please refer to tools/test_remote_bshlib.sh
 
 ## Usage
 1. On a local linux machine, clone moon_bshauto.
-2. Deploy moon_bshauto to the remote nodes.
+2. Enter the src directory and make binary tools.
+```
+  # cd src
+  # make clean
+  # make all
+  # make install
+``` 
+3. Deploy moon_bshauto to the remote nodes.
 ```
   # moon_bshauto/tools/deploy.sh
   Usage: deploy.sh -f host_file|-h host_list [-d path]
@@ -166,7 +183,7 @@ For the tools executed by driver.sh, please refer to tools/test_remote_bshlib.sh
   
   # moon_bshauto/tools/deploy.sh -h 192.168.78.78
 ```
-3. Run test cases
+4. Run test cases
 ```
   # moon_bshauto/bin/driver.sh
   Usage: driver.sh -f|-s|-p|-l [-d dir1 [-d dir2] ...] [tc [tc] ...]
@@ -179,7 +196,7 @@ For the tools executed by driver.sh, please refer to tools/test_remote_bshlib.sh
   
   # moon_bshauto/bin/driver.sh -f -d ut_test 
 ```
-4. Two ways to run tools:
+5. Two ways to run tools:
 * Execute the tool directly.
 
   Register the necessary libraries and configuration files by the tool itself.
