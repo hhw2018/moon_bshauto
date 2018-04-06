@@ -1,0 +1,51 @@
+MOON_BSHAUTO_CPU_LIB_DEF=YES
+
+function _get_value_from_cpuinfo {
+    local key="$1"
+    local val=$(egrep "^${key}[[:space:]]*:" /proc/cpuinfo | awk '{print $NF}' | sort -u)
+    echo "$val"
+}
+
+function cpu_count_physical {
+    _get_value_from_cpuinfo "physical id" | wc -l
+}
+
+function cpu_count_processor {
+    _get_value_from_cpuinfo "processor" | wc -l
+}
+
+function cpu_count_core {
+    _get_value_from_cpuinfo "core id" | wc -l
+}
+
+# cpu_get_util_perc cpu_id
+#   cpu_id: logical processor id, or all.
+#
+# Return:
+#   Average percentage of utilization for the specified processor. e.g.
+#   %user=xx
+#   %system=xx
+#   %idle=xx
+function cpu_get_util_perc {
+    local freq="1 3"
+    local perc=0
+    local id=$1
+    shift
+
+    (($# == 2)) && freq="$*" 
+
+    sar -P ALL $freq |egrep "^Average:[[:space:]]+$id" | awk '{printf "%%user=%.2f\n%%system=%.2f\n%%idle=%.2f\n", $3,$5,$8}'
+}
+
+function cpu_eat {
+    :
+}
+
+function cpu_fill_perc {
+    :
+}
+ 
+function cpu_free {
+    pkill -9 eat_cpu
+}
+
