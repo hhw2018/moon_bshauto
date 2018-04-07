@@ -1,0 +1,9 @@
+[[ -z "$MOON_BSHAUTO_REMOTE_LIB_DEF" ]] && . $MOON_BSHAUTO_FW_LIB/remote.bshlib
+MOON_BSHAUTO_CI_LIB_DEF=YES
+
+function ci_is_runner_working {
+    local remote=$1
+    rcml $remote "ps -ef | grep driver.sh | grep -v grep" &>/dev/null
+    return $?
+}
+
