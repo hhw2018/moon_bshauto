@@ -130,12 +130,15 @@ CPU_CLI=""
 CPU_ID=""
 PERC_OBJ=""
 function main {
-    local out=""
-
     parse_arguments $@
     config
-    out=$($CPU_CLI $CPU_ID)
-    [[ -n "$PERC_OBJ" ]] && egrep "${PERC_OBJ%|}" <<< "$out" || echo "$out"
+    
+    if [[ -n "$PERC_OBJ" ]]; then
+        local out=$($CPU_CLI $CPU_ID)
+        egrep "${PERC_OBJ%|}" <<< "$out"
+    else
+        $CPU_CLI $CPU_ID
+    fi
 }
 
 main $@

@@ -18,6 +18,10 @@ function cpu_count_core {
     _get_value_from_cpuinfo "core id" | wc -l
 }
 
+function cpu_get_processor_list {
+    _get_value_from_cpuinfo "processor" | xargs
+}
+
 # cpu_get_util_perc cpu_id
 #   cpu_id: logical processor id, or all.
 #
@@ -37,12 +41,13 @@ function cpu_get_util_perc {
     sar -P ALL $freq |egrep "^Average:[[:space:]]+$id" | awk '{printf "%%user=%.2f\n%%system=%.2f\n%%idle=%.2f\n", $3,$5,$8}'
 }
 
-function cpu_eat {
-    :
-}
-
 function cpu_fill_perc {
-    :
+    local perc=$1
+    shift
+    local cpu_list="$*"
+
+    [[ "$cpu_list" == "all" ]] && cpu_list=$(cpu_get_processor_list)
+    $MOON_BSHAUTO_BIN/eat_cpu $perc $cpu_list & 
 }
  
 function cpu_free {
