@@ -2,11 +2,36 @@
 
 ## Introduction
 moon_bshauto is an automation framework implemented using bash script, which can
-be used for both tests and tools automation. It will supply many libraries 
-developed for general system administration use. And its capabilities can be 
-extended by user-defined libraries, used for users' business application.
+be used for both tests and tools automation. It supplys many libraries developed
+for general system administration. And its capabilities can be extended by 
+user-defined libraries, which will be used for users' business application.
 
-## Directory
+A simplified version of a CI(continuous integration) system is supported. It 
+assumes you're running against a git repository. 
+
+## CI 
+ci_observer.sh will check if there is any commit for each project defined in 
+MOON_BSHAUTO_CI_PROJECTS by the end of everday; ci_dispatcher.sh will try to 
+pick up idle runners from hosts defined in MOON_BSHAUTO_CI_RUNNER, and notify
+the runners to kick off testing, runners will employ ci_runner.sh to run the 
+specific test cases defined in {project_name}_{test_type} against the project.
+
+{project_name}_{test_type} defined in ci.cfg holds the specific test cases to
+be run against project "project_name", in which test_type is one of the 
+following: functional or stress or longevity or performance.
+```conf/framework/ci.cfg
+  export MOON_BSHAUTO_CI_RUNNER="localhost 192.168.230.132"
+  export moon_bshauto_functional="-d dir1 -d dir2"
+  export moon_bshauto_stress="-d dir1 dir_2_tc2"
+  export project2_functional="-d dir1"
+  export project3_functional="-d dir1"
+  export project4_functional="-d dir1"
+  export MOON_BSHAUTO_CI_PROJECTS="moon_bshauto project2"
+```
+MOON_BSHAUTO_CI_PROJECTS holds a subset of git projects, it defines what 
+projects will be monitored by CI.
+
+## Directories and files
 ### bin
 Script here can be executed separatly on the local host. Generally it is in a 
 one-to-one relationship with another bshlib file defined in lib/framework, e.g.
@@ -15,37 +40,52 @@ implement networking operations. Of course we can write any scripts implementing
 any kinds of functions. 
 
 ### lib
-#### framework
+#### lib/framework
 Framework libraries can be used for framework as well as general system 
 administration. e.g. net.bshlib is created for implementing networking related
 operations while remote.bshlib is for executing commands on a remote node.
  
-#### user
+#### lib/user
 User libraries are used for users' business purpose(tests or tools), they can 
 call functions defined in framework libraries and always they are used only for
 test cases and user tools. 
 
 ### conf
-#### framework
+#### conf/framework
 Environment variables are defined here which are used for framework.
 
-#### user
+#### conf/user
 Environment variables are defined here which are used for users' business 
 purpose, please be noted that we can re-defined framework environment 
 variables here.
 
 ### tests
-#### functional
-It includes functional test cases.
+#### tests/project_name
+You can put all your projects' test cases into tests directory,differentiated by
+project_name, project_name can be specified in two ways:
+1. With CI supported.
+  project_name must be your git project name. MOON_BSHAUTO_CI_PROJECTS in ci.cfg
+  holds all project names monitored by CI. 
 
-#### longevity
-It includes longevity test cases.
+  Here I put moon_bshauto into tests, which holds functional test cases against
+  moon_bshauto project..
 
-#### stress
-It includes stress test cases.
+2. Without CI supported.
+  project_name can be anything, put your functional, longevity, stress and
+  performance test cases into project_name directory, execute driver.sh to 
+  perform the testing directly.
 
-#### performance
-It includes performance test cases.
+##### tests/project_name/functional
+functional directory holds functional test cases.
+
+##### tests/project_name/longevity
+longevity directory holds longevity test cases.
+
+##### tests/project_name/stress
+stress directory holds stress test cases.
+
+##### tests/project_name/performance
+performance directory holds performance test cases.
 
 ### tools
 User-defined tools are created here, which are implemented for business purpose.
@@ -183,20 +223,25 @@ For the tools executed by driver.sh, please refer to tools/test_remote_bshlib.sh
   
   # moon_bshauto/tools/deploy.sh -h 192.168.78.78
 ```
-4. Run test cases
+4. Run test cases without CI supported.
 ```
   # moon_bshauto/bin/driver.sh
-  Usage: driver.sh -f|-s|-p|-l [-d dir1 [-d dir2] ...] [tc [tc] ...]
+  Usage: driver.sh -f|-s|-p|-l proj [-d dir1 [-d dir2] ...] [tc [tc] ...]
     -f: Perform functional testing under tests/functional.
     -s: Perform stress testing under tests/stress.
     -p: Perform performance testing under tests/performance.
     -l: Perform longevity testing under tests/longevity.
+  proj: The project name monitored by git.
     -d: Test case directory name.
     tc: Test case name, which is global unique.
   
-  # moon_bshauto/bin/driver.sh -f -d ut_test 
+  # moon_bshauto/bin/driver.sh -f moon_bshauto -d remote
 ```
-5. Two ways to run tools:
+5. Run test cases with CI supported.
+5.1 Configure conf/framework/ci.cfg. Please refer to the comments in ci.cfg.
+5.2 Add ci_observer.sh into crontab, let it run by the end of every day.
+
+6. Run tools in two ways:
 * Execute the tool directly.
 
   Register the necessary libraries and configuration files by the tool itself.
