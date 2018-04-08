@@ -1,9 +1,59 @@
 [[ -z "$MOON_BSHAUTO_REMOTE_LIB_DEF" ]] && . $MOON_BSHAUTO_FW_LIB/remote.bshlib
 MOON_BSHAUTO_CI_LIB_DEF=YES
 
-function ci_is_runner_working {
+#
+# ci_is_runner_busy remote
+#   remote: remote host name or ip address.
+#
+# Return:
+#   0 if runner is working
+#   1 if runner is idle
+#
+function ci_is_runner_busy {
     local remote=$1
     rcml $remote "ps -ef | grep driver.sh | grep -v grep" &>/dev/null
     return $?
+}
+
+#
+# ci_get_runners cnt
+#   cnt: Count of runners required by dispatcher.
+#
+# Return:
+#   A list of host names or ip addresses. 
+# 
+# Note:
+#   If there is not enough idle runners, just return the working runners.
+#   Make sure dispatcher can always get cnt runners.
+#
+function ci_get_runners {
+    local host=""
+    local busy_list=""
+    local idle_list=""
+    local i=0
+
+    for host in $MOON_BSHAUTO_CI_RUNNER; do
+        ci_is_runner_busy $host \
+            && busy_list="$host $busy_list"  \
+            || idle_list="$host $idle_list"
+    done
+
+    # Try to get cnt idle hosts from idle_list;
+    # If there isn't enough idle hosts, try to get hosts from busy_list;
+    for host in $idle_list $busy_list; do
+        list="$list $host"
+        ((++i == cnt)) && break
+    done
+
+    list=${list# }
+
+    # Still, we cannot get enough hosts, 
+    # loop to add the 1st host in list to the list head
+    while ((i < cnt)); do
+        list="$list ${list%% *}"
+        ((++i))
+    done
+
+    echo "$list"
 }
 

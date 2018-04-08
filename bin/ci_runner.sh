@@ -1,16 +1,21 @@
 #!/usr/bin/env bash 
+
 NAME=${0##*/}
     
 function usage {
 cat <<EOF
-Usage: $NAME project_name
+Usage: $NAME project_name test_type
+  project_name: the project managed by CI.
+  test_type: functional or stress or longevity or performance.
 EOF
     exit 1
 }
 
 function parse_argument {
     PROJECT=$1
-    [[ -z "$PROJECT" ]] && usage
+    TEST_TYPE=$2
+
+    [[ -z "$PROJECT" || -z "$TEST_TYPE" ]] && usage
 }
 
 # Register the framework env vars and lib functions
@@ -28,7 +33,30 @@ function config {
 }
 
 function run {
-    $MOON_BSHAUTO_BIN/driver.sh $(eval echo \$${PROJECT}_tc_list)
+    local opt=""
+
+    case $TEST_TYPE in
+    functional)
+        opt="-f"
+        ;;
+        
+    stress)
+        opt="-s"
+        ;;
+    
+    longevity)
+        opt="-l"
+        ;;
+    
+    performance)
+        opt="-p"
+        ;;
+    *)
+        usage
+    esac
+
+    #$MOON_BSHAUTO_BIN/driver.sh $opt $(eval echo \$$PROJECT_$TEST_TYPE)
+    echo "$MOON_BSHAUTO_BIN/driver.sh $opt $(eval echo \$$PROJECT_$TEST_TYPE)"
 }
 
 function main {
@@ -38,4 +66,5 @@ function main {
 }
 
 PROJECT=""
+TEST_TYPE=""
 main $@

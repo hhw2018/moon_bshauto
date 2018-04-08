@@ -27,26 +27,21 @@ function config {
     . $MOON_BSHAUTO_FW_CONF/ci.cfg
 }
 
-function pickup_host {
-    local ret=""
-    local host=""
-
-    for host in $MOON_BSHAUTO_CI_RUNNER; do
-        if ! ci_is_runner_working $host; then
-            ret=$host
-            break
-        fi
-    done
-
-    # Pick up one if there is not idle runner.
-    [[ -z "$ret" ]] && ret=${MOON_BSHAUTO_CI_RUNNER## }
-
-    echo $ret
-}
-
 function run {
-    local host=$(pickup_host)
-    rcli_host $host $MOON_BSHAUTO_BIN/ci_runner.sh $PROJECT
+    local test_arr=($(egrep -ow "${PROJECT}_functional|${PROJECT}_stress|${PROJECT}_longevity|${PROJECT}_performance" $MOON_BSHAUTO_FW_CONF/ci.cfg))
+    local host_cnt=${#test_arr[@]}
+    
+    ((host_cnt < 1)) && echo "No test cases specified for project $PROJECT" && exit 1
+
+    local i=0
+    local host=""
+    local test_type=""
+    for host in $(ci_get_runners $host_cnt); do
+        test_type=${test_array[$i]#${PROJECT}_}
+        echo "Start a runner for the $test_type testing on host $host against project $PROJECT."
+        rcli_host $host $MOON_BSHAUTO_BIN/ci_runner.sh $PROJECT $test_type
+        ((++i))
+    done
 }
 
 function main {

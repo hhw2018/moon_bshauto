@@ -4,11 +4,12 @@ function usage {
     local name=${0##*\/}
 
 cat <<EOF
-Usage: driver.sh -f|-s|-p|-l [-d dir1 [-d dir2 ...]] [tc [tc...]]
+Usage: driver.sh -f|-s|-p|-l proj [-d dir1 [-d dir2 ...]] [tc [tc...]]
   -f: Perform functional testing under tests/functional.
   -s: Perform stress testing under tests/stress.
   -p: Perform performance testing under tests/performance.
   -l: Perform longevity testing under tests/longevity.
+proj: The project name managed by git.
   -d: Test case directory name.
   tc: Test case name, which is global unique.
 
@@ -29,12 +30,13 @@ function config_framework {
     export MOON_BSHAUTO_USER_LIB=$MOON_BSHAUTO_HOME/lib/user
     export MOON_BSHAUTO_FW_CONF=$MOON_BSHAUTO_HOME/conf/framework
     export MOON_BSHAUTO_USER_CONF=$MOON_BSHAUTO_HOME/conf/user
+
     if [[ "$g_type" == "tools" ]]; then
         export MOON_BSHAUTO_TOOLS=$MOON_BSHAUTO_HOME/tools
         export MOON_BSHAUTO_LOG=$MOON_BSHAUTO_HOME/log/tools
     else
-        export MOON_BSHAUTO_TESTS=$MOON_BSHAUTO_HOME/tests/$g_type
-        export MOON_BSHAUTO_LOG=$MOON_BSHAUTO_HOME/log/tests/$g_type
+        export MOON_BSHAUTO_TESTS=$MOON_BSHAUTO_HOME/tests/$g_project/$g_type
+        export MOON_BSHAUTO_LOG=$MOON_BSHAUTO_HOME/log/tests/$g_project/$g_type
     fi
      
     # Register the framework env vars
@@ -64,7 +66,10 @@ function parse_arguments {
     local file_list=""
     local opt_cnt=0
     local opt=$1
-    shift
+    local g_project=$2
+    shift 2
+
+    [[ -z "$g_project" ]] && usage
 
     case $opt in
         -l)
@@ -95,8 +100,9 @@ function parse_arguments {
     esac
 
     ((opt_cnt != 1)) && usage
+
     if [[ "$g_type" == "tools" ]]; then 
-        [[ -z "$g_file_list" ]]  && usage | return
+        [[ -z "$g_file_list" ]]  && usage || return
     fi
 
     while (($# > 0)); do
@@ -130,6 +136,7 @@ function get_tc2run {
 
     local file=""
     local dir=""
+
     for file in $g_file_list; do
         is_str_existed "$file" $MOON_BSHAUTO_LOG_PATH/tc.run && continue
 
@@ -172,7 +179,7 @@ function perform_testing {
        
 # Perform tests in a specific dir in a newly forked child process,
 # which can prevent namespace conflict, esp. env vars. So env vars defined in
-# local config file can only be used by this process and its children.
+# local config file can only be used by the process itself and its children.
 (
         export MOON_BSHAUTO_TC_DIR=$MOON_BSHAUTO_TESTS/$dir
 
@@ -226,6 +233,7 @@ function use_tool {
 g_type=""
 g_dir_list=""
 g_file_list=""
+g_project=""
 
 function main {
     parse_arguments $@
