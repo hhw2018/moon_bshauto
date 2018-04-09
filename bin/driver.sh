@@ -154,6 +154,11 @@ function get_tc2run {
 # Generate the tc list including all tc in tests
 function get_all_tc {
     local dir=""
+
+    [[ ! -d $MOON_BSHAUTO_TESTS ]] \
+        && echo "No '$g_type' test cases found for project '$g_project' in tests directory." \
+        && exit 1
+
     for dir in $(ls $MOON_BSHAUTO_TESTS); do
         echo "$dir: $(ls $MOON_BSHAUTO_TESTS/$dir | egrep -vw 'bshlib|config|setup|cleanup' | xargs)"
     done > $MOON_BSHAUTO_LOG_PATH/tc.all
