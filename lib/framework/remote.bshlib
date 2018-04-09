@@ -52,7 +52,7 @@ function rcml_expl {
 
     # combine the keywords and make a cml for spawn
     local cml=$(sed -r "s/\"/'/g" <<< "$*")
-    local cml="${EXP_RCMD:-ssh} $user@$host \"$cml\""
+    local cml="${MOON_BSHAUTO_EXP_RCMD:-ssh} $user@$host \"$cml\""
 
     _rcml "$cml"
     return $?

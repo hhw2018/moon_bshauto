@@ -55,8 +55,7 @@ function run {
         usage
     esac
 
-    #$MOON_BSHAUTO_BIN/driver.sh $opt $(eval echo \$$PROJECT_$TEST_TYPE)
-    echo "$MOON_BSHAUTO_BIN/driver.sh $opt $(eval echo \$$PROJECT_$TEST_TYPE)"
+    $MOON_BSHAUTO_BIN/driver.sh $opt $PROJECT $(eval echo \$$PROJECT_$TEST_TYPE)
 }
 
 function main {

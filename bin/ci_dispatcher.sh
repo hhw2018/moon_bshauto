@@ -23,8 +23,9 @@ function config {
     export MOON_BSHAUTO_FW_CONF=$MOON_BSHAUTO_HOME/conf/framework
      
     # Register the necessary framework env vars as well as libs 
-    . $MOON_BSHAUTO_FW_LIB/ci.bshlib
+    . $MOON_BSHAUTO_FW_CONF/expect.cfg
     . $MOON_BSHAUTO_FW_CONF/ci.cfg
+    . $MOON_BSHAUTO_FW_LIB/ci.bshlib
 }
 
 function run {
@@ -37,9 +38,9 @@ function run {
     local host=""
     local test_type=""
     for host in $(ci_get_runners $host_cnt); do
-        test_type=${test_array[$i]#${PROJECT}_}
+        test_type=${test_arr[$i]#${PROJECT}_}
         echo "Start a runner for the $test_type testing on host $host against project $PROJECT."
-        rcli_host $host $MOON_BSHAUTO_BIN/ci_runner.sh $PROJECT $test_type
+        rcml_host $host $MOON_BSHAUTO_BIN/ci_runner.sh $PROJECT $test_type
         ((++i))
     done
 }
