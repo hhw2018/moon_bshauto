@@ -72,8 +72,15 @@ project_name, project_name can be specified in two ways:
 
 2. Without CI supported.
   project_name can be anything, put your functional, longevity, stress and
-  performance test cases into project_name directory, execute driver.sh to 
+  performance test cases into tests/project_name directory, execute driver.sh to
   perform the testing directly.
+```
+    # Run all test cases in tests/abc/functional directory.
+    driver.sh -f abc
+
+    # Run test cases in dir1 and dir2 in tests/abc/stress directory.
+    driver.sh -s abc -d dir1 -d dir2
+```
 
 ##### tests/project_name/functional
 functional directory holds functional test cases.
@@ -106,13 +113,13 @@ into src directory, and install the binary files into bin.
 ## Examples
 ### Test Case Example
 Please be noted that this is a sample for writing test cases. Please follow the
-way to write your own test cases:
+way to write your own:
 
 * Test case directory 
 
-  ut_tests
+  tests/moon_bshauto/functional/remote 
 
-  Put ut_tests into one of the directories: functional/stress/longevity/performance.
+  So remote is created for functional testing against moon_bshauto project.
 * config
 
   The config file defines all envrionment variables used for the test cases.
@@ -124,7 +131,7 @@ way to write your own test cases:
     export SIZE=10
   
 ```
-* dir_1.bshlib
+* remote.bshlib
 
   The library file defines all functions used for the test cases.
 ```
@@ -158,14 +165,14 @@ way to write your own test cases:
     log_must dd if=/dev/urandom of=$TEST_FILE bs=1M count=$SIZE
     log_pass "Created a 10m file."
 ```
-* dir_1_tc1, dir_1_tc2, dir_1_tc3
+* remote_tc_1, remote_tc_2, remote_tc_3
 
-  Test cases.
+  Test cases hold the testing steps as well as the expected results.
 ```
     # Register functions defined in local lib file; driver.sh has already
-    # register all framework lib functions; Also, we can register user lib
+    # register all framework lib functions; Also, we can register lib/user
     # functions here.
-    . $MOON_BSHAUTO_TC_DIR/dir_1.bshlib
+    . $MOON_BSHAUTO_TC_DIR/remote.bshlib
     
     # Register cleanup function, which can be called before tc exits.
     log_onexit cleanup 
@@ -189,16 +196,34 @@ way to write your own test cases:
     log_pass "Removed the test file."
 ```
   **Please never rename the config/setup/cleanup files.**
+  **Please always use suffix .bshlib for lib files.**
 
   Log snippet 
 ```
-    2018-04-04-22:16:48 TEST CASE: /root/moon_bshauto/tests/functional/ut_tests/dir_1_tc1
-    2018-04-04-22:16:48 VERIFY: Copy a local file to the remote.
-    2018-04-04-22:16:48 ACTION: rcml scp -rp /tmp/test_file.10480 root@localhost:/tmp/test_file.10480.dup (ret=0)
-    2018-04-04-22:16:48 OUTPUT: test_file.10480      0% 0     0.0KB/s   --:-- ETAtest_file.10480                                                                                             100% 10MB  10.0MB/s   00:00
-    2018-04-04-22:16:48 PASSED: Copied a local file to the remote sucessfully.
-    2018-04-04-22:16:48 ONEXIT: Call function 'cleanup'
-    2018-04-04-22:16:48 cleanup: called before tc exits.
+  # ./driver.sh -f moon_bshauto remote_tc_1
+  # cd ../log/tests/moon_bshauto/functional/2018-04-09-11\:34\:29.8901/
+  # more log.8901
+  2018-04-09-11:34:29 TEST PATH BEGIN: /root/moon_bshauto/tests/moon_bshauto/functional/remote
+  2018-04-09-11:34:29 VERIFY: Create a 10m file.
+  2018-04-09-11:34:29 ACTION: dd if=/dev/urandom of=/tmp/test_file.8901 bs=1M count=10 (ret=0)
+  2018-04-09-11:34:29 OUTPUT: 10+0 records in
+  10+0 records out
+  10485760 bytes (10 MB, 10 MiB) copied, 0.016631 s, 630 MB/s
+  2018-04-09-11:34:29 PASSED: Created a 10m file.
+  2018-04-09-11:34:29 TEST CASE: /root/moon_bshauto/tests/moon_bshauto/functional/remote/remote_tc_1
+  2018-04-09-11:34:29 VERIFY: Copy a local file to the remote.
+  2018-04-09-11:34:30 ACTION: rcml scp -rp /tmp/test_file.8901 root@localhost:/tmp/test_file.8901.dup (ret=0)
+  2018-04-09-11:34:30 OUTPUT: test_file.8901                                                                                                0%
+    0     0.0KB/s   --:-- ETAtest_file.8901                                                                                              100%
+    10MB  10.0MB/s   00:00
+  2018-04-09-11:34:30 PASSED: Copied a local file to the remote sucessfully.
+  2018-04-09-11:34:30 ONEXIT: Call function 'cleanup'
+  2018-04-09-11:34:30 cleanup: called before tc exits.
+  2018-04-09-11:34:30 VERIFY: Remove the file created.
+  2018-04-09-11:34:30 ACTION: rm -rf /tmp/test_file.8901 (ret=0)
+  2018-04-09-11:34:30 OUTPUT:
+  2018-04-09-11:34:30 PASSED: Removed the test file.
+  2018-04-09-11:34:30 TEST PATH END: /root/moon_bshauto/tests/moon_bshauto/functional/remote
 ```
 ### Tools Example
 For the tools executed directly, please refer to tools/deploy.sh.
@@ -231,14 +256,16 @@ For the tools executed by driver.sh, please refer to tools/test_remote_bshlib.sh
     -s: Perform stress testing under tests/stress.
     -p: Perform performance testing under tests/performance.
     -l: Perform longevity testing under tests/longevity.
-  proj: The project name monitored by git.
+  proj: The project name.
     -d: Test case directory name.
     tc: Test case name, which is global unique.
   
   # moon_bshauto/bin/driver.sh -f moon_bshauto -d remote
 ```
 5. Run test cases with CI supported.
+
 5.1 Configure conf/framework/ci.cfg. Please refer to the comments in ci.cfg.
+
 5.2 Add ci_observer.sh into crontab, let it run by the end of every day.
 
 6. Run tools in two ways:

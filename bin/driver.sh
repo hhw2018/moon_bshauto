@@ -10,6 +10,7 @@ Usage: driver.sh -f|-s|-p|-l proj [-d dir1 [-d dir2 ...]] [tc [tc...]]
   -p: Perform performance testing under tests/performance.
   -l: Perform longevity testing under tests/longevity.
 proj: The project name. 
+      Test cases are located in different 'proj' in tests directory.
   -d: Test case directory name.
   tc: Test case name, which is global unique.
 
