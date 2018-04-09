@@ -1,0 +1,7 @@
+. $MOON_BSHAUTO_TC_DIR/remote.bshlib
+
+log_onexit cleanup
+
+log_assert "Copy a local file to the remote."
+cp_file_to_remote 
+log_pass "Copied a local file to the remote sucessfully."

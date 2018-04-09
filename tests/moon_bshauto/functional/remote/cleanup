@@ -1,0 +1,3 @@
+log_assert "Remove the file created."
+log_must rm -rf $TEST_FILE
+log_pass "Removed the test file."

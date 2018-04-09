@@ -1,0 +1,6 @@
+export MOON_BSHAUTO_EXP_USER=root
+export MOON_BSHAUTO_EXP_USER_PASSWD=changeme
+export TEST_FILE=/tmp/test_file.$$
+export REMOTE=localhost
+export SIZE=10
+

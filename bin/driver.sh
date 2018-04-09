@@ -9,7 +9,7 @@ Usage: driver.sh -f|-s|-p|-l proj [-d dir1 [-d dir2 ...]] [tc [tc...]]
   -s: Perform stress testing under tests/stress.
   -p: Perform performance testing under tests/performance.
   -l: Perform longevity testing under tests/longevity.
-proj: The project name managed by git.
+proj: The project name. 
   -d: Test case directory name.
   tc: Test case name, which is global unique.
 
@@ -66,7 +66,7 @@ function parse_arguments {
     local file_list=""
     local opt_cnt=0
     local opt=$1
-    local g_project=$2
+    g_project=$2
     shift 2
 
     [[ -z "$g_project" ]] && usage

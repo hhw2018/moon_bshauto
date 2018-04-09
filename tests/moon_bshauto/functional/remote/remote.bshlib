@@ -1,0 +1,20 @@
+
+function cleanup {
+    log_msg "cleanup: called before tc exits."
+}
+
+function cp_file_to_remote {
+    log_must rcml scp -rp $TEST_FILE $MOON_BSHAUTO_EXP_USER@$REMOTE:${TEST_FILE}.dup
+}
+
+function chk_remote_file_exist {
+    log_must rcml_host $REMOTE ls ${TEST_FILE}.dup
+}
+
+function chk_remote_file_size {
+    local size=0
+    size=$(rcml_host $REMOTE stat -c %s ${TEST_FILE}.dup)
+    (( size = size / 1024 / 1024))
+    log_must assert $size -eq $SIZE
+}
+

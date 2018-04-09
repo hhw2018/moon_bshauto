@@ -1,0 +1,3 @@
+log_assert "Create a 10m file."
+log_must dd if=/dev/urandom of=$TEST_FILE bs=1M count=$SIZE
+log_pass "Created a 10m file."

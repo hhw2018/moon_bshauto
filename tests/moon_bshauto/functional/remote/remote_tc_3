@@ -1,0 +1,5 @@
+. $MOON_BSHAUTO_TC_DIR/remote.bshlib
+
+log_assert "Check the size of remote file." 
+chk_remote_file_size 
+log_pass "The size is correct."

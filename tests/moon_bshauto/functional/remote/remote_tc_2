@@ -1,0 +1,5 @@
+. $MOON_BSHAUTO_TC_DIR/remote.bshlib
+
+log_assert "Check the remote file exists."
+chk_remote_file_exist 
+log_pass "The remote file existed."
