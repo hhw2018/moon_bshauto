@@ -29,7 +29,8 @@ following: functional or stress or longevity or performance.
   export MOON_BSHAUTO_CI_PROJECTS="moon_bshauto project2"
 ```
 MOON_BSHAUTO_CI_PROJECTS holds a subset of git projects, it defines what 
-projects will be monitored by CI.
+projects will be monitored by CI. i.e. CI will only check the update for the 
+projects listed in MOON_BSHAUTO_CI_PROJECTS. 
 
 ## Directories and files
 ### bin
