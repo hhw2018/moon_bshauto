@@ -30,6 +30,7 @@ function ci_get_runners {
     local host=""
     local busy_list=""
     local idle_list=""
+    local cnt=$1
     local i=0
 
     for host in $MOON_BSHAUTO_CI_RUNNER; do

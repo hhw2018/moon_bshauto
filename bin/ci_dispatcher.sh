@@ -29,7 +29,7 @@ function config {
 }
 
 function run {
-    local test_arr=($(egrep -ow "${PROJECT}_functional|${PROJECT}_stress|${PROJECT}_longevity|${PROJECT}_performance" $MOON_BSHAUTO_FW_CONF/ci.cfg))
+    local test_arr=($(egrep -v "[[:space:]]*#" $MOON_BSHAUTO_FW_CONF/ci.cfg | egrep -ow "${PROJECT}_functional|${PROJECT}_stress|${PROJECT}_longevity|${PROJECT}_performance"))
     local host_cnt=${#test_arr[@]}
     
     ((host_cnt < 1)) && echo "No test cases specified for project $PROJECT" && exit 1

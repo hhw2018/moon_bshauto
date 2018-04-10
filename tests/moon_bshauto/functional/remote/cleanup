@@ -1,3 +1,3 @@
 log_assert "Remove the file created."
-log_must rm -rf $TEST_FILE
+log_must rm -rf $TEST_FILE ${TEST_FILE}.dup
 log_pass "Removed the test file."

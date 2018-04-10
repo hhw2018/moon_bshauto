@@ -41,9 +41,14 @@ function check_update {
         commit=$(git log --pretty="%H %cd" --since="$today")
         
         # Notify dispatcher to pick up a runner to run tests.
-        [[ -n "$commit" ]] \
-            && rcml_host $MOON_BSHAUTO_CI_DISPATCHER $MOON_BSHAUTO_BIN/ci_dispatcher.sh $project \
-            || echo "No update for project $project."
+        if [[ -n "$commit" ]]; then
+            echo "Today's update for $project."
+            echo "$commit"
+
+            rcml_host $MOON_BSHAUTO_CI_DISPATCHER $MOON_BSHAUTO_BIN/ci_dispatcher.sh $project
+        else
+            echo "No update for project $project."
+        fi
     done
 }
 
